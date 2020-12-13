@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta content="text/html;charset=UTF-8"/>
+	<title>fsLayuiPlugin</title>
+	<meta name="keywords" content="fsLayuiPlugin,layui,layuiPlugin,layui插件" />
+    <meta name="description" content="fsLayuiPlugin,layui,layuiPlugin,layui插件" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+	<meta http-equiv ="Pragma" content = "no-cache"/>
+	<meta http-equiv="Cache-Control" content="no cache" />
+	<meta http-equiv="Expires" content="0" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+	<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<meta name="format-detection" content="telephone=no"/>
+	<link rel="stylesheet" type="text/css" href="/plugins/layui/css/layui.css" media="all"/>
+	<link rel="stylesheet" type="text/css" href="/css/fs.css" media="all"/>
+	<script type="text/javascript" src="/plugins/layui/layui.js"></script>
+	<script type="text/javascript" src="/plugins/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="/plugins/frame/js/fs.js?v=1.5.0"></script>
+	
+</head>
+<body class="layui-layout-body">
+	<div class="layui-fluid">
+	  <div class="layui-form-item">
+	  	<div style="text-align: center;">
+		    <div class="layui-upload-drag" style="width: 320px;">
+			  <i class="layui-icon"></i>
+			  <p id="fileName">點選上載，或將文件拖拽到此處</p>
+			</div>
+	  	</div>
+	  </div>
+	  <hr/>
+	  <div class="layui-form-item">
+	    <div class="layui-input-block">
+	      <button id="upload" class="layui-btn">開始上載</button>
+	      <button type="button" class="layui-btn layui-btn-primary" function="close">關閉</button>
+	    </div>
+	  </div>
+
+	</div>
+</body>
+<script>
+layui.use(['upload','layer','fsConfig','fsCommon'], function(){
+  var upload = layui.upload,
+  fsConfig = layui.fsConfig,
+  layer = layui.layer,
+  fsCommon = layui.fsCommon,
+  isSelectFile = false,//是否選擇文件，預設false
+  statusName = $.result(fsConfig,"global.result.statusName","errorNo"),
+  msgName = $.result(fsConfig,"global.result.msgName","errorInfo"),
+  uploadUrl = $.result(fsConfig,"global.uploadUrl",""),
+  dataName = $.result(fsConfig,"global.result.dataName","results.data");
+  
+  var uploadFilePath = top.$('meta[name="uploadFilePath"]');
+  if(uploadFilePath.length==0)
+  {
+	top.$('head').append("<meta name=\"uploadFilePath\" content=\"\"/>");
+  }else{
+ 	uploadFilePath.attr("content","");
+  }
+  
+  
+  //獲取參數
+  var paramUrl = fsCommon.getUrlParam();
+  
+  var fileAccept,fileExts,fileSize;
+  
+  //獲取業務參數綁定
+  if(!$.isEmpty(paramUrl["fileParam"])){
+  	var fileParam = JSON.parse(unescape(paramUrl["fileParam"]));
+  	fileAccept = fileParam["fileAccept"];
+  	fileExts = fileParam["fileExts"];
+  	fileSize = fileParam["fileSize"];
+  }
+  delete paramUrl["fileParam"];
+  
+  //綁定預設按鈕
+  fsCommon.buttionEvent();
+  
+  var loadIndex;
+  
+  //選完文件後不自動上載
+  upload.render({
+    elem: '.layui-upload-drag'
+    ,url: uploadUrl
+    ,data: paramUrl
+    ,accept :fileAccept
+    ,exts :fileExts
+    ,size :fileSize
+    ,auto: false
+    ,before: function(){
+    	if(!isSelectFile){
+    		fsCommon.warnMsg("請選擇文件！");
+    		return;
+    	}
+    	
+    	loadIndex = layer.load(); //上載loading
+    }
+    //,multiple: true
+    ,bindAction: '#upload'
+    ,choose: function(obj){
+    	isSelectFile = true;
+    	obj.preview(function(index, file, result){
+    		$("#fileName").html(file.name);
+    	})
+    }
+    ,done: function(result){
+		layer.closeAll(loadIndex); //關閉loading
+		
+		if(result[statusName] != "0"){
+			var filters = fsConfig["filters"];
+		   	if(!$.isEmpty(filters)){
+	     	  var otherFunction = filters[result[statusName]];
+	      	  if($.isFunction(otherFunction)){
+	       	     otherFunction(result);
+	      	      return;
+	     	   }
+		    }
+	   		fsCommon.errorMsg(result[msgName]);
+	   		return;
+		}
+		
+		//上載成功後，返回文件路徑
+		var data = $.result(result,dataName);
+		
+		top.$('meta[name="uploadFilePath"]').attr("content",data["filePath"]);
+		
+		//關閉
+		var index = parent.layer.getFrameIndex(window.name); //獲取視窗索引
+		parent.layer.close(index);
+		
+    },
+    error: function(index, upload){
+		layer.closeAll(loadIndex); //關閉loading
+    }
+  });
+
+});
+</script>
+</html>

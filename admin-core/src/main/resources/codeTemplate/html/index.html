@@ -1,0 +1,24 @@
+<!--#layout("/common/layout.html",{"jsBase":"/js/${target.urlBase}/${entity.code}/"}){ -->
+<layui:searchForm formId="searchForm"  condition="${'${search\}'}">
+</layui:searchForm>
+
+<div class="layui-btn-group">
+    <layui:accessButton function="${target.urlBase}.${entity.code}.add"  action="add">增加</layui:accessButton>
+    <layui:accessButton function="${target.urlBase}.${entity.code}.edit"  action="edit">編輯</layui:accessButton>
+    <layui:accessButton function="${target.urlBase}.${entity.code}.delete"  action="del">刪除</layui:accessButton>
+    @if(entity.includeExcel){
+     <layui:accessButton function="${target.urlBase}.${entity.code}.exportDocument"  action="exportDocument">導出</layui:accessButton>
+     <layui:accessButton function="${target.urlBase}.${entity.code}.importDocument"  action="importDocument">導入</layui:accessButton>
+    @}
+</div>
+
+<table id="${entity.code}Table" lay-filter="${entity.code}Table"></table>
+<!--#} -->
+<script>
+
+layui.use(['index'], function(){
+    var index = layui.index
+    index.init();
+});
+
+</script>

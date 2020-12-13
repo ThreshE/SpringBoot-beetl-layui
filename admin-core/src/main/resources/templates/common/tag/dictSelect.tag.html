@@ -1,0 +1,50 @@
+<!--#
+/*簡單一級字典下拉列錶控件
+<layui:simpleDictSelect  type="org_type"
+					 name="orgType" value="${user.orgId}" />
+*/
+-->
+
+    <!--#
+    if(has(readonly)){
+        var dicts = [];
+        var selectedDict = null;
+        if(isNotEmpty(type)){
+            dicts = dict.dictDownQuery(type);
+        }else if(isNotEmpty(group)&&isNotEmpty(value)){
+            //級聯選擇
+            dicts = dict.dictListByValue(group,value);
+        }
+        var expected = value!"";
+        for(dict in dicts){
+            if(dict.value==(expected+"")){
+                selectedDict = dict;
+                break;
+            }
+        }
+    -->
+    <input type="text"  class="layui-input" value="${selectedDict.name}"></input>
+    <input type="hidden"  name="${name}" ${isNotEmpty(layVerify)?('lay-verify="'+layVerify+'"'):''} value="${expected}"></input>
+    <!--#}else{  -->
+    <input type="text" class="${class}" value="${value}" name="${name}" ${has(id)?("list="+id+"List" ):''} ${isNotEmpty(layVerify)?('lay-verify="'+layVerify+'"'):''}>
+    <datalist ${has(id)?("id="+id+"List"):''}>
+        <!--#
+        var dicts = [];
+        if(isNotEmpty(type)){
+            dicts = dict.dictDownQuery(type);
+        }else if(isNotEmpty(group)&&isNotEmpty(value)){
+            //級聯選擇
+            dicts = dict.dictListByValue(group,value);
+        }
+        var expected = value!"";
+        //dict.invertList(dicts);
+        for(dict in dicts){
+     -->
+
+        <option>${dict.name}</option>
+
+        <!--#}-->
+    </datalist>
+
+    <!--#}  -->
+

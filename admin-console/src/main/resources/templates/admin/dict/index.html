@@ -1,0 +1,22 @@
+<!--#layout("/common/layout.html",{"jsBase":"/js/admin/dict/"}){ -->
+<layui:searchForm formId="searchForm"  condition="${search}">
+</layui:searchForm>
+
+  <div class="layui-btn-group">
+  	<layui:accessButton function="dict.add"  action="add">增加</layui:accessButton>
+  	<layui:accessButton function="dict.edit"  action="edit">編輯</layui:accessButton>
+  	<layui:accessButton function="dict.del"  action="del">刪除</layui:accessButton>
+  	<layui:accessButton function="dict.exportExcel"  action="exportExcel">導出</layui:accessButton>
+  		<layui:accessButton function="dict.importExcel"  action="importExcel">導入</layui:accessButton>
+  
+  </div>
+<table id="dictTable" lay-filter="dictTable"></table>
+<!--#} -->
+<script>
+
+layui.use(['index'], function(){
+  var index = layui.index
+  index.init();
+});
+
+</script>
