@@ -301,6 +301,16 @@ public class RoleConsoleController {
             }
         }
         functionConsoleService.updateSysRoleFunction(roleId, addIds, delIds);
+        //为去除数据授权的功能，给所有功能默认加【5】的权限
+        ArrayList list = new ArrayList();
+        for (int i = 0;i < all.size();i++){
+            RoleDataAccessFunction data = new RoleDataAccessFunction();
+            data.setRoleId(roleId);
+            data.setId(all.get(i));
+            data.setDataAccessType(5);
+            list.add(i,data);
+        }
+        functionConsoleService.updateFunctionAccessByRole(list);
         return JsonResult.success();
     }
 
